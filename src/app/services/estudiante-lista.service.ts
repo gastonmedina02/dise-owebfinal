@@ -6,7 +6,7 @@ import { Students } from '../models/students';
 @Injectable({
   providedIn: 'root'
 })
-export class EstudianteListaService {
+  export class EstudianteListaService {
 
   private url = "https://backend-idra-production.up.railway.app/student"
 
@@ -25,12 +25,8 @@ export class EstudianteListaService {
     return this.http.post(this.url + '/' + s.id + '/update', s);
   }
 
-  delete(/*s*/id: number): Observable <any>{
-    return 	this.http.post(this.url + '/' + /*s.*/id + '/delete', null)
+  delete(id: number): Observable <any>{
+    return 	this.http.post(this.url + '/' + id + '/delete', null)
   }
-
-  /*view(id: number, Students: any): Observable <any>{
-    return this.http.post(this.url + '/' + id + '/view', null)
-  }*/
 
 }

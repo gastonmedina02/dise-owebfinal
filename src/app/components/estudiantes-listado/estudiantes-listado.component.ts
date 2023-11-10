@@ -1,16 +1,19 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, TemplateRef } from '@angular/core';
 import { EstudianteListaService } from 'src/app/services/estudiante-lista.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap'
 import { Students } from 'src/app/models/students';
 import { FormControl,FormGroup,Validators } from '@angular/forms';
+
 
 @Component({
   selector: 'app-estudiantes-listado',
   templateUrl: './estudiantes-listado.component.html',
   styleUrls: ['./estudiantes-listado.component.css']
 })
-export class EstudiantesListadoComponent implements OnInit {
-
+  export class EstudiantesListadoComponent implements OnInit {
+   
+  @ViewChild('confirmDelete', { static: false }) private confirmDeleteModal: TemplateRef<any>;
+  studentToDelete: Students | null = null;
 
   studentList = new Array<Students>()
 
@@ -25,9 +28,8 @@ export class EstudiantesListadoComponent implements OnInit {
   firstName3: string
   email3: string
 
-    student = new Students()
-    studentForm : FormGroup
-   
+  student = new Students()
+  studentForm : FormGroup
 
   constructor(private EstudianteListaService: EstudianteListaService, private modalService: NgbModal) { }
 
@@ -126,6 +128,32 @@ export class EstudiantesListadoComponent implements OnInit {
           })
         }
       }, reason => { })
+    }
+
+    askToDelete(student: Students) {
+      this.studentToDelete = student;
+      this.modalService.open(this.confirmDeleteModal).result.then(
+        (result) => {
+          if (result === 'delete') {
+            this.confirmDeletion();
+          }
+        },
+        (reason) => {
+          this.studentToDelete = null;
+        }
+      );
+    }
+
+    confirmDeletion() {
+      if (this.studentToDelete) {
+        this.EstudianteListaService.delete(this.studentToDelete.id).subscribe(() => {
+          this.studentList = this.studentList.filter(student => student.id !== this.studentToDelete?.id);
+          this.modalService.dismissAll();
+        }, error => {
+          console.error(error);
+          alert('Error: ' + error.error.message);
+        });
+      }
     }
 
   }
